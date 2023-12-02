@@ -1,7 +1,7 @@
 const User = require("../Models/userModel");
 const sendToken = require("../Utils/jwtToke");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
-const ErrorHandler= require("../Utils/errorhander")
+const ErrorHandler= require("../Utils/errorHandler")
 const sendEmail= require("../Utils/sendEmail")
 const crypto = require("crypto")
 
@@ -188,6 +188,17 @@ exports.resetPassword = catchAsyncErrors(async (req, res, next) => {
   await user.save();
 
   sendToken(user, 200, res);
+});
+// Get User Detail
+//only user login can get this route
+//this route is used in combination with auth.js function
+exports.getUserDetails = catchAsyncErrors(async (req, res, next) => {
+  const user = await User.findById(req.user.id);
+
+  res.status(200).json({
+    success: true,
+    user,
+  });
 });
 
 
