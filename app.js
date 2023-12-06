@@ -12,10 +12,12 @@ const errorMiddleware = require("./middleware/error");
 
 const items=require("./routes/homeRoute")
 const user=require("./routes/userRoute")
+const order=require("./routes/orderRoute")
 
 
 app.use("/api/v1",items)
 app.use("/api/v1",user)
+app.use("/api/v1",order)
 
 
 // Middleware for Errors
