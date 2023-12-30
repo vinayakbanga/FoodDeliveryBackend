@@ -57,43 +57,44 @@ exports.registerUser = async (req, res, next) => {
   }
 };
 
-//login user
-exports.loginUser=async(req,res,next)=>{
-  const{email,password} =req.body;
+exports.loginUser = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
 
-  if(!email||!password){
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "Please enter email and password",
+      });
+    }
+
+    const user = await User.findOne({ email }).select("+password");
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: "No user found",
+      });
+    }
+      
+    const isPasswordMatched = await user.comparePassword(password);
+    
+    if (!isPasswordMatched) {
+      return res.status(400).json({
+        success: false,
+        message: "Wrong email or password",
+      });
+    }
+
+    sendToken(user, 201, res);
+  } catch (error) {
+    // Handle unexpected errors
+    console.error(error);
     res.status(500).json({
       success: false,
-      message: "Please enter email password",
+      message: "Internal Server Error",
     });
   }
-  const user= await User.findOne({email}).select("+password");
-  if(!user){
-    return  res.status(400).json({
-      success: false,
-      message: "No user",
-    });
-  }
-
-  const isPasswordMatched=user.comparePassword(password);
-
-  if(!isPasswordMatched){
-    return  res.status(400).json({
-      success: false,
-      message: "Wrong Email or password",
-    });
-  }
-  // const token=user.getJWTToken(); 
-   
-
-  //   res.status(201).json({
-  //     success: true,
-  //     token,
-  //   });
-  sendToken(user,201,res);
-
-
-}
+};
 
 exports.logout=catchAsyncErrors(async(req,res,next)=>{
 res.cookie('token',null,{
