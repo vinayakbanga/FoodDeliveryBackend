@@ -2,13 +2,18 @@ const Order= require("../Models/orderModel")
 const Items= require("../Models/menuModel")
 const ErrorHandler=require("../Utils/errorHandler")
 const catchAsyncErrors=require("../middleware/catchAsyncErrors")
-
-
+// let io;
+// function getIo() {
+//   if (!io) {
+//     io = require('../app').io;
+//   }
+//   return io;
+// }
 //create new order
 exports.newOrder= catchAsyncErrors(async(req,res,next)=>{
 
     const {
-        shippingInfo,
+        shippinginfo,
         orderItems,
         paymentInfo,
         itemsPrice,
@@ -19,7 +24,7 @@ exports.newOrder= catchAsyncErrors(async(req,res,next)=>{
     //   console.log(req.user._id);
 
       const order = await Order.create({
-        shippingInfo,
+        shippinginfo,
         orderItems,
         paymentInfo,
         itemsPrice,
@@ -88,6 +93,8 @@ exports.getAllOrders = catchAsyncErrors(async (req, res, next) => {
 //update order status
 exports.updateOrder = catchAsyncErrors(async (req, res, next) => {
   const order = await Order.findById(req.params.id);
+  // const orderId= req.params.id;
+  // const status= req.body.status;
 
   if(order.orderStatus==="Delivered"){
     return next(new ErrorHandler("You have delivered this order",400))
@@ -98,7 +105,17 @@ exports.updateOrder = catchAsyncErrors(async (req, res, next) => {
   if (req.body.status === "Delivered") {
     order.deliveredAt = Date.now();
   }
+
+   
+  
   await order.save({ validateBeforeSave: false });
+  
+// const io=getIo;
+  // io.to(orderId).emit('orderUpdated', { orderId,status  });
+//   io.to(`{req.params.id}`).emit('orderUpdated', {
+//     orderId: req.params.id,
+//     status: req.body.status // replace with actual status
+// });
 
   res.status(200).json({
     success: true,
@@ -117,5 +134,20 @@ exports.deleteOrder = catchAsyncErrors(async (req, res, next) => {
 
   res.status(200).json({
     success: true,
+  });
+});
+
+// Delete all orders
+exports.deleteAllOrders = catchAsyncErrors(async (req, res, next) => {
+  // You might want to add authentication and authorization checks here
+  // to ensure that only an admin can perform this action.
+
+  // Delete all orders from the database
+  await Order.deleteMany({});
+
+  // Send response
+  res.status(200).json({
+      success: true,
+      message: "All orders have been deleted"
   });
 });

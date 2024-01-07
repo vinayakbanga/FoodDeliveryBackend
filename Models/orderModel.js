@@ -1,7 +1,7 @@
 const mongoose=require("mongoose")
 
 const orderSchema= new mongoose.Schema({
-    shippingInfo: {
+    shippinginfo: {
         address: {
           type: String,
           required: true,
@@ -95,7 +95,7 @@ const orderSchema= new mongoose.Schema({
       orderStatus: {
         type: String,
         required: true,
-        default: "Processing",
+        default: "Order Placed",
       },
       deliveredAt: Date,
       createdAt: {
